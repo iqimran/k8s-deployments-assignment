@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-blue
+  labels:
+    app: webapp
+    track: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webapp
+      track: blue
+  template:
+    metadata:
+      labels:
+        app: webapp
+        track: blue
+    spec:
+      containers:
+      - name: webapp
+        image: iqimran/webapp:v1
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 2

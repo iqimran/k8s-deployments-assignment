@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: webapp-rollout
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: webapp-canary
+  template:
+    metadata:
+      labels:
+        app: webapp-canary
+    spec:
+      containers:
+      - name: webapp
+        image: iqimran/webapp:canary  # v2 candidate
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+  strategy:
+    canary:
+      canaryService: webapp-canary
+      stableService: webapp-canary
+      steps:
+        - setWeight: 10
+        - pause: {duration: 60}
+        - setWeight: 50
+        - pause: {duration: 60}
+        - setWeight: 100
