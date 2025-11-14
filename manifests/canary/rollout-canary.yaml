@@ -6,15 +6,15 @@ spec:
   replicas: 4
   selector:
     matchLabels:
-      app: webapp-canary
+      app: webapp
   template:
     metadata:
       labels:
-        app: webapp-canary
+        app: webapp
     spec:
       containers:
       - name: webapp
-        image: iqimran/webapp:canary  # v2 candidate
+        image: iqimran/webapp   # new version being tested
         ports:
         - containerPort: 8080
         readinessProbe:
@@ -23,11 +23,11 @@ spec:
             port: 8080
   strategy:
     canary:
+      stableService: webapp-stable
       canaryService: webapp-canary
-      stableService: webapp-canary
       steps:
         - setWeight: 10
-        - pause: {duration: 60}
+        - pause: { duration: 30 }
         - setWeight: 50
-        - pause: {duration: 60}
+        - pause: { duration: 30 }
         - setWeight: 100
